@@ -9,7 +9,7 @@ module.exports = defineConfig({
         productName: "i18nTools",
         appId: "com.i18nTools.tools",
         win: {
-          icon: "./public/logo.png",
+          icon: "./static/logo.png",
           target: [
             {
               target: "nsis",
@@ -19,11 +19,11 @@ module.exports = defineConfig({
           publish: ["github"],
         },
         mac: {
-          icon: "./public/logo.png",
+          icon: "./static/logo.png",
           target: ["pkg", "dmg", "zip"],
         },
         linux: {
-          icon: "./public/logo.png",
+          icon: "./static/logo.png",
         },
         publish: ['github']
       }

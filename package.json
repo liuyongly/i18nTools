@@ -18,6 +18,8 @@
     "@jamescoyle/vue-icon": "^0.1.2",
     "@pictogrammers/memory": "^1.2.0",
     "core-js": "^3.8.3",
+    "electron-log": "^4.4.8",
+    "electron-updater": "^6.1.4",
     "json-as-xlsx": "^2.5.4",
     "line-by-line": "^0.1.6",
     "lodash": "^4.17.21",

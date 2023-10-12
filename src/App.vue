@@ -6,7 +6,7 @@
         :window="true"
         class="systemBar title font-weight-bold font-italic d-flex justify-space-between"
       >
-        <div class="flex-grow-1 logo"><v-icon>$memoryGamepadUpRight </v-icon>i18nTools</div>
+        <div class="flex-grow-1 logo"><v-icon class="logo__icon">$memoryGamepadUpRight </v-icon>i18nTools</div>
         <div class="btn">
           <v-icon class="system__btn" @click="windowMin">$memoryMinusCircle </v-icon>
           <v-icon class="system__btn" @click="windowClose">$memoryRemoveCircle </v-icon>
@@ -86,10 +86,15 @@ export default {
 .systemBar {
   .logo {
     -webkit-app-region: drag;
+    .logo__icon {
+      &:hover {
+        color:#009688 !important;
+      }
+    }
   }
   .system__btn {
     &:hover {
-      color: red !important;
+      color:#009688 !important;
     }
   }
 }
