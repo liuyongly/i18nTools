@@ -25,7 +25,10 @@ module.exports = defineConfig({
         linux: {
           icon: "./static/logo.png",
         },
-        publish: ['github']
+        publish: ['github'],
+        extraResources: [
+            {from: './static', to: 'static'}
+        ]
       }
     }
   },
