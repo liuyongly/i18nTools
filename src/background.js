@@ -105,7 +105,7 @@ app.on("ready", async () => {
   });
   initIpc(ipcMain, dialog, win);
 
-  tray = new Tray(path.join(__dirname, "../public/logo.png"));
+  tray = new Tray(path.join(__static, "../public/logo.png"));
   const contextMenu = Menu.buildFromTemplate([
     // {
     //   label: "设置",
@@ -181,33 +181,33 @@ const checkUpdate = (win) =>{
 	//更新错误事件
 	autoUpdater.on('error', function (error) {
 		sendUpdateMessage(returnData.error)
-		log.info(returnData.error, error)
+		// log.info(returnData.error, error)
 	});
 
 	//检查事件
 	autoUpdater.on('checking-for-update', function () {
 		sendUpdateMessage(returnData.checking)
-		log.info(returnData.checking)
+		// log.info(returnData.checking)
 	});
 
 	//发现新版本
 	autoUpdater.on('update-available', function () {
 		sendUpdateMessage(returnData.updateAva)
-		log.info(returnData.updateAva)
+		// log.info(returnData.updateAva)
 	});
 
 	//当前版本为最新版本
 	autoUpdater.on('update-not-available', function () {
 		setTimeout(function () {
 			sendUpdateMessage(returnData.updateNotAva)
-			log.info(returnData.updateNotAva)
+			// log.info(returnData.updateNotAva)
 		}, 1000);
 	});
 
 	//更新下载进度事件
 	autoUpdater.on('download-progress', function (progressObj) {
 		win.webContents.send('downloadProgress', progressObj)
-		log.info('正在下载',progressObj)
+		// log.info('正在下载',progressObj)
 	});
 
 
@@ -216,7 +216,7 @@ const checkUpdate = (win) =>{
 	autoUpdater.on('update-downloaded', function () {
 		//退出并进行安装（这里可以做成让用户确认后再调用）
 		autoUpdater.quitAndInstall();
-		log.info("下载完毕")
+		// log.info("下载完毕")
 	});
 
 	//发送消息给窗口
