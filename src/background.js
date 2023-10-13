@@ -103,40 +103,43 @@ app.on("ready", async () => {
     }
   });
   ipcMain.on("window-close", function () {
-    win.hide();
+    // win.hide();
+    win.destroy()
+    app.quit();
   });
+
   initIpc(ipcMain, dialog, win);
 
-  tray = new Tray(path.join(__static, "../static/logo.png"));
-  const contextMenu = Menu.buildFromTemplate([
-    // {
-    //   label: "设置",
-    //   click: function () {
-    //     console.log("setting");
-    //   },
-    // },
-    // {
-    //   label: "升级",
-    //   click: function () {
-    //     console.log("update");
-    //   },
-    // },
-    {
-      label: "退出",
-      click: function () {
-        if (process.platform !== "darwin") {
-          win.destroy()
-          app.quit();
-        }
-      },
-    },
-  ]);
+  // tray = new Tray(path.join(__static, "../static/logo.png"));
+  // const contextMenu = Menu.buildFromTemplate([
+  //   // {
+  //   //   label: "设置",
+  //   //   click: function () {
+  //   //     console.log("setting");
+  //   //   },
+  //   // },
+  //   // {
+  //   //   label: "升级",
+  //   //   click: function () {
+  //   //     console.log("update");
+  //   //   },
+  //   // },
+  //   {
+  //     label: "退出",
+  //     click: function () {
+  //       if (process.platform !== "darwin") {
+  //         win.destroy()
+  //         app.quit();
+  //       }
+  //     },
+  //   },
+  // ]);
 
-  tray.setToolTip("i18n_tools");
-  tray.setContextMenu(contextMenu);
-  tray.on("click", () => {
-    win.show();
-  })
+  // tray.setToolTip("i18n_tools");
+  // tray.setContextMenu(contextMenu);
+  // tray.on("click", () => {
+  //   win.show();
+  // })
 
   checkUpdate(win)
 });
