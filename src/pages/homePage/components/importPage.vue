@@ -52,7 +52,12 @@
       </v-form>
 
       <v-card-actions>
-        <v-btn outlined rounded text @click="exportHandler"> 生成 </v-btn>
+        <v-text-field
+        :value="savePath"
+        :disabled="true"
+        prepend-icon="$memoryMonitor"
+            label="保存位置"
+          ></v-text-field><v-btn outlined rounded text @click="choseSavePath"> 请选择保存位置 </v-btn><v-btn outlined rounded text @click="exportHandler"> 生成 </v-btn>
       </v-card-actions>
     </v-card>
     <!-- <v-dialog v-model="addDialogVisible" width="500" @click:outside="close">
@@ -94,6 +99,7 @@ export default {
   inject: ["message"],
   data() {
     return {
+      savePath: '',
       valid: false,
       types: [".js", ".xml", ".strings", ".properties"],
       form: {
@@ -107,7 +113,11 @@ export default {
       addDialogVisible: false,
     };
   },
-
+  created() {
+    this.savePath = localStorage.getItem("savePath_generate")
+      ? localStorage.getItem("savePath_generate")
+      : this.savePath;
+  },
   mounted() {},
 
   methods: {
@@ -122,22 +132,20 @@ export default {
         this.form.file,
         this.form.file.path.replace(this.form.file.name, "")
       );
-      this.ipcRenderer
-        .invoke(
-          "selectFolder",
-          JSON.stringify({
-            title: "选择生成的目标文件夹",
-            defaultPath: this.form.file.path.replace(this.form.file.name, ""),
-          })
-        )
-        .then((res) => {
-          if (res && !res.canceled) {
-            xls2json(this.form, res.filePaths[0], () => {
-              this.message("success", "生成i18n文件成功!");
-            });
-          }
-        });
+      if (!this.savePath)
+        return this.message("warning", "请选择保存位置");
+      xls2json(this.form, this.savePath,() => {
+        this.message("success", "生成i18n文件成功!");
+      });
     },
+    choseSavePath() {
+      this.ipcRenderer.invoke('selectFolder', JSON.stringify({title: '选择保存位置'})).then(res =>{
+          if (res && !res.canceled) {
+            this.savePath = res.filePaths[0];
+            localStorage.setItem("savePath_generate", this.savePath);
+          }
+        })
+    }
   },
 };
 </script>

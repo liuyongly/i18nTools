@@ -22,7 +22,6 @@
                 placeholder="选择 i18n 文件"
                 :label="'选择 i18n 文件' + `(${lang.label})`"
                 prepend-icon="$memorySword"
-                :rules="filesRules"
               >
                 <template v-slot:selection="{ text }">
                   <v-chip
@@ -49,7 +48,12 @@
       </v-form>
 
       <v-card-actions>
-        <v-btn outlined rounded text @click="exportHandler"> 导出 </v-btn>
+        <v-text-field
+        :value="savePath"
+        :disabled="true"
+        prepend-icon="$memoryMonitor"
+            label="保存位置"
+          ></v-text-field><v-btn outlined rounded text @click="choseSavePath"> 请选择保存位置 </v-btn><v-btn outlined rounded text @click="exportHandler"> 导出 </v-btn>
       </v-card-actions>
     </v-card>
     <v-dialog v-model="addDialogVisible" width="500" @click:outside="close">
@@ -92,7 +96,7 @@ export default {
   inject: ["message"],
   data() {
     return {
-      files: [],
+      savePath: '',
       valid: false,
       canChoseLangs: [
         {
@@ -115,7 +119,7 @@ export default {
       addFrom: {
         value: "",
         label: "",
-        files: [],
+        files: null
       },
       addFromRules: {
         valueRules: [(v) => !!v || "请输入 Lang Code"],
@@ -125,7 +129,14 @@ export default {
       addDialogVisible: false,
     };
   },
-
+  created() {
+    this.canChoseLangs = localStorage.getItem("canChoseLangs")
+      ? JSON.parse(localStorage.getItem("canChoseLangs"))
+      : this.canChoseLangs;
+    this.savePath = localStorage.getItem("savePath")
+      ? localStorage.getItem("savePath")
+      : this.savePath;
+  },
   mounted() {},
 
   methods: {
@@ -144,13 +155,22 @@ export default {
       console.log("exportHandler", validate);
       if (!validate) return;
       const type = [];
+      let leastOne = false
       this.canChoseLangs.forEach((lang) => {
         console.log(lang.files);
-        type.push(path.extname(lang.files.path));
+        if (lang.files) {
+          leastOne = true
+          lang.files.path && type.push(path.extname(lang.files.path));
+        }
       });
+      if (!leastOne) return this.message("warning", "请选择至少一个文件");
       if (Array.from(new Set(type)).length > 1)
         return this.message("warning", "请选择同一类型文件");
-      json2xls(this.canChoseLangs, () => {
+      if (!this.savePath)
+        return this.message("warning", "请选择保存位置");
+
+
+      json2xls(this.canChoseLangs.filter(lang => lang.files), this.savePath, () => {
         this.message("success", "导出成功!");
       });
     },
@@ -160,12 +180,14 @@ export default {
       this.canChoseLangs = this.canChoseLangs.filter(
         (item) => item.value != lang.value
       );
+      localStorage.setItem("canChoseLangs", JSON.stringify(this.canChoseLangs));
     },
     addLang() {
       const validate = this.$refs.addForm.validate();
       if (validate) {
         this.canChoseLangs.push({...this.addFrom});
         this.close();
+        localStorage.setItem("canChoseLangs", JSON.stringify(this.canChoseLangs));
       }
       console.log("validate", validate);
     },
@@ -178,6 +200,14 @@ export default {
       };
       this.addDialogVisible = false
     },
+    choseSavePath() {
+      this.ipcRenderer.invoke('selectFolder', JSON.stringify({title: '选择保存位置'})).then(res =>{
+          if (res && !res.canceled) {
+            this.savePath = res.filePaths[0];
+            localStorage.setItem("savePath", this.savePath);
+          }
+        })
+    }
   },
 };
 </script>

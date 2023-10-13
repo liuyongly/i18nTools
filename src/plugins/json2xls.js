@@ -1,16 +1,14 @@
 var fs = require("fs");
 var json2xls = require("json-as-xlsx");
-var XLSX = require("xlsx");
+// var XLSX = require("xlsx");
 var _ = require("lodash");
 var convert = require("xml-js");
 const path = require("path");
 const LineByLineReader = require("line-by-line");
-import { ipcRenderer } from "electron";
 
-export default function (options, cb) {
+export default function (options, savePath, cb) {
   console.log("options", options);
   console.log("options[0]", options[0]);
-  const originObject = {};
   let origin = [];
   // newOutput()
   // return
@@ -28,6 +26,7 @@ export default function (options, cb) {
     },
   ];
   options.forEach(async (item, index) => {
+    const originObject = {};
     const extname = path.extname(item.files.path);
     const data = fs.readFileSync(item.files.path, "utf-8");
     // console.log("data", data);
@@ -51,7 +50,7 @@ export default function (options, cb) {
       origin.forEach((o) => {
         o[item.value] = originObject[o.name];
       });
-      if (index === options.length - 1) output(origin, transferOption,extname, cb);
+      if (Object.keys(origin[0]).length -1 === options.length) output(origin, transferOption,extname,savePath, cb);
     } else if (extname === ".strings") {
       // console.log(".strings", data)
       const errLine = [];
@@ -87,7 +86,7 @@ export default function (options, cb) {
         origin.forEach((o) => {
           o[item.value] = originObject[o.name];
         });
-        if (index === options.length - 1) output(origin, transferOption,extname, cb);
+        if (Object.keys(origin[0]).length -1 === options.length) output(origin, transferOption,extname,savePath, cb);
       });
     } else if (extname === ".js") {
       // console.log(eval("require('"+item.files.path.replaceAll('\\','\\\\')+"')"))
@@ -101,8 +100,8 @@ export default function (options, cb) {
       origin.forEach((o) => {
         o[item.value] = _.get(originObject, o.name);
       });
-      if (index === options.length - 1) {
-        output(origin, transferOption,extname, cb);
+      if (Object.keys(origin[0]).length -1 === options.length) {
+        output(origin, transferOption,extname,savePath, cb);
       }
     } else if (extname === ".properties") {
       const errLine = [];
@@ -136,13 +135,14 @@ export default function (options, cb) {
         origin.forEach((o) => {
           o[item.value] = originObject[o.name];
         });
-        if (index === options.length - 1) output(origin, transferOption,extname, cb);
+        console.log('output:::::::',index, Object.keys(origin[0]).length -1)
+        if (Object.keys(origin[0]).length -1 === options.length) output(origin, transferOption,extname,savePath, cb);
       });
     }
   });
 }
 
-const output = (origin, transferOption,extname, cb) => {
+const output = (origin, transferOption,extname,savePath, cb) => {
   console.log("transferOption", transferOption);
   if (origin[0]) {
     for (const key in origin[0]) {
@@ -163,16 +163,12 @@ const output = (origin, transferOption,extname, cb) => {
     }, // Style options from https://docs.sheetjs.com/docs/api/write-options
     RTL: false, // Display the columns from right-to-left (the default value is false)
   };
-  ipcRenderer.invoke('selectFolder', JSON.stringify({title: '选择要导出的目标文件夹'})).then(res =>{
-      if (res && !res.canceled) {
-        console.log(res)
-        settings.fileName = res.filePaths[0] + `\\${settings.fileName}_${extname.slice(1,extname.length)}_${parseTime(new Date(), "{y}-{m}-{d}_{h}-{i}-{s}")}`;
-        json2xls(transferOption, settings,() => {
-          cb()
-        }); // Will download the excel file
-        console.log("输出excel成功！");
-      }
-  })
+
+  settings.fileName = savePath + `\\${settings.fileName}_${extname.slice(1,extname.length)}_${parseTime(new Date(), "{y}-{m}-{d}_{h}-{i}-{s}")}`;
+  json2xls(transferOption, settings,() => {
+    cb()
+  }); // Will download the excel file
+  console.log("输出excel成功！");
 
 };
 function flatten(data) {
