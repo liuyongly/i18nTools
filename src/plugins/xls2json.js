@@ -100,7 +100,7 @@ export default function ({ type, file }, path, cb) {
         if (key !== "name") {
           !strObj.hasOwnProperty(key) && (strObj[key] = "");
           let strValue = encodeURIComponent(item[key])
-          let strName = encodeURIComponent(item[key])
+          let strName = encodeURIComponent(item.name)
           strValue = strValue.replaceAll('%0A', '\\n')
           strName = strName.replaceAll('%0A', '\\n')
           strObj[key] += `"${decodeURIComponent(strName)}" = "${decodeURIComponent(strValue)}";${os.EOL}`;
